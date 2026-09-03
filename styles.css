@@ -1,0 +1,1035 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   Tesla — Olya-E3 / Home • Desktop (Figma 23:207)
+   Static HTML/CSS build. No motion, no transitions, no JavaScript.
+   Section order and numbering below match the Figma layer names 1:1.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. DESIGN TOKENS
+   Mirrored from the Figma variable collection. Do not hand-tune these —
+   change them here and the whole page follows.
+   ========================================================================== */
+
+:root {
+  /* -- Palette ------------------------------------------------------------ */
+  --color-neutral-darkest: #020809;
+  --color-white:           #ffffff;
+  --color-black:           #000000;
+  --color-royal-blue:      #4e6cda;
+  --color-transparent:     rgba(255, 255, 255, 0);
+
+  /* -- Color scheme 1 (light sections) ------------------------------------ */
+  --scheme-1-background: #ffffff;
+  --scheme-1-foreground: #f2f2f2;
+  --scheme-1-text:       #020809;
+  --scheme-1-border:     rgba(2, 8, 9, 0.15);
+
+  /* -- Color scheme 3 (grey sections) ------------------------------------- */
+  --scheme-3-background: #f2f2f2;
+  --scheme-3-text:       #020809;
+  --scheme-3-border:     rgba(2, 8, 9, 0.15);
+
+  /* -- Type family -------------------------------------------------------- */
+  --font-sans: "Manrope", "Segoe UI", -apple-system, BlinkMacSystemFont,
+               "Helvetica Neue", Arial, sans-serif;
+
+  /* -- Type scale ---------------------------------------------------------
+     Fluid between a 480px and a 1440px viewport; the upper bound is the
+     exact Figma value, so at >= 1440px the page is pixel-faithful.       */
+  --text-small:   14px;
+  --text-regular: 16px;
+  --text-medium:  clamp(16px, 15.00px + 0.208vw, 18px);
+  --heading-6:    clamp(18px, 16.00px + 0.417vw, 22px);
+  --heading-5:    clamp(22px, 19.00px + 0.625vw, 28px);
+  --heading-4:    clamp(26px, 21.00px + 1.042vw, 36px);
+  --heading-3:    clamp(30px, 23.00px + 1.458vw, 44px);
+  --heading-2:    clamp(32px, 22.00px + 2.083vw, 52px);
+  --heading-1:    clamp(40px, 24.00px + 3.333vw, 72px);
+
+  /* -- Line heights ------------------------------------------------------- */
+  --leading-tight:   1.2;   /* H1, H2, H3 */
+  --leading-snug:    1.3;   /* H4         */
+  --leading-relaxed: 1.4;   /* H5, H6     */
+  --leading-body:    1.5;   /* body copy  */
+
+  /* -- Letter spacing ----------------------------------------------------- */
+  --tracking-heading: -0.01em;   /* Figma "letterSpacing: -1" (= -1%) */
+  --tracking-body:    0;
+
+  /* -- Weights ------------------------------------------------------------ */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+
+  /* -- Radii -------------------------------------------------------------- */
+  --radius-large:        8px;
+  --radius-button:       6px;
+  --radius-slider-arrow: 4px;
+
+  /* -- Strokes ------------------------------------------------------------ */
+  --stroke-border-width:  0px;
+  --stroke-divider-width: 1px;
+
+  /* -- Spacing ------------------------------------------------------------ */
+  --page-padding:           clamp(20px, -2.00px + 4.583vw, 64px);
+  --section-padding-large:  clamp(64px, 40.00px + 5.000vw, 112px);
+  --section-padding-medium: clamp(48px, 32.00px + 3.333vw, 80px);
+
+  --space-8:  8px;
+  --space-10: 10px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-80: 80px;
+
+  /* -- Layout widths ------------------------------------------------------ */
+  --container-large:  1280px;
+  --max-width-large:  768px;
+  --max-width-footer: 920px;
+
+  /* -- Component metrics --------------------------------------------------
+     Buttons/arrows use an "inside stroke": padding + 1px border adds up to
+     the exact Figma box (44px / 40px / 48px).                            */
+  --button-padding-y:    9px;
+  --button-padding-x:    23px;
+  --button-padding-y-sm: 7px;
+  --button-padding-x-sm: 19px;
+  --slider-arrow-padding: 11px;
+  --slider-arrow-icon:    24px;
+  --slider-gap:  clamp(16px, 3.333vw, 48px);
+  --slide-width: 84.375%;   /* 1080 / 1280 — leaves the designed peek */
+  --stat-icon:   56px;
+  --dot-size:    8px;
+}
+
+
+/* ==========================================================================
+   2. RESET & BASE
+   ========================================================================== */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--scheme-1-background);
+  color: var(--scheme-1-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-regular);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, p, figure { margin: 0; }
+
+ul, ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img, svg { display: block; }
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+hr {
+  margin: 0;
+  border: 0;
+}
+
+sup.footnote {
+  /* The Figma text reads "…$99/mo.1" inline, not raised. The tag stays for
+     meaning; the styling matches the design. */
+  font-size: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+  top: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-royal-blue);
+  outline-offset: 3px;
+}
+
+
+/* ==========================================================================
+   3. LAYOUT PRIMITIVES
+   ========================================================================== */
+
+/* Page gutter — Figma "Page Padding / padding-global". */
+.shell {
+  width: 100%;
+  padding-inline: var(--page-padding);
+}
+
+/* Figma "Container / container-large". */
+.container {
+  width: 100%;
+  max-width: var(--container-large);
+  margin-inline: auto;
+}
+
+/* Figma "Section Padding / padding-section-large". */
+.section {
+  position: relative;
+  padding-block: var(--section-padding-large);
+  background-color: var(--scheme-1-background);
+}
+
+/* Image frame. The frame owns the crop; the <img> inside stays free to be
+   scaled or panned later without touching layout. */
+.media {
+  position: relative;
+  overflow: hidden;
+}
+
+.media--fill {
+  position: absolute;
+  inset: 0;
+}
+
+/* Absolute, so the image never contributes its intrinsic height to layout —
+   the frame owns the box, exactly as the Figma fills do. Every .media gets
+   its height from a stretch, an aspect-ratio or a --fill parent. */
+.media__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+
+/* ==========================================================================
+   4. TYPOGRAPHY HELPERS
+   ========================================================================== */
+
+.heading-1,
+.heading-2,
+.heading-3,
+.heading-4,
+.heading-5,
+.heading-6 {
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-heading);
+}
+
+.heading-1 { font-size: var(--heading-1); line-height: var(--leading-tight); }
+.heading-2 { font-size: var(--heading-2); line-height: var(--leading-tight); }
+.heading-3 { font-size: var(--heading-3); line-height: var(--leading-tight); }
+.heading-4 { font-size: var(--heading-4); line-height: var(--leading-snug); }
+.heading-5 { font-size: var(--heading-5); line-height: var(--leading-relaxed); }
+.heading-6 { font-size: var(--heading-6); line-height: var(--leading-relaxed); }
+
+.text-medium { font-size: var(--text-medium); line-height: var(--leading-body); }
+.text-small  { font-size: var(--text-small);  line-height: var(--leading-body); }
+
+
+/* ==========================================================================
+   5. UTILITIES
+   ========================================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  padding: 12px 20px;
+  transform: translateY(-120%);
+  background-color: var(--color-neutral-darkest);
+  color: var(--color-white);
+  font-size: var(--text-regular);
+  font-weight: var(--weight-medium);
+}
+
+.skip-link:focus-visible { transform: translateY(0); }
+
+
+/* ==========================================================================
+   6. COMPONENT — Button
+   Figma: "Button" instance. 44px tall (default), 40px tall (--sm).
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--button-padding-y) var(--button-padding-x);
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  font-size: var(--text-regular);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-body);
+  white-space: nowrap;
+}
+
+.btn--sm { padding: var(--button-padding-y-sm) var(--button-padding-x-sm); }
+
+.btn--primary {
+  background-color: var(--color-royal-blue);
+  border-color: var(--color-royal-blue);
+  color: var(--color-white);
+}
+
+.btn--dark {
+  background-color: var(--color-black);
+  border-color: var(--color-black);
+  color: var(--color-white);
+}
+
+.btn--light {
+  background-color: var(--color-white);
+  border-color: var(--color-transparent);
+  color: var(--color-neutral-darkest);
+}
+
+/* Button rows. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-24);
+}
+
+.actions--center { justify-content: center; }
+.actions--tight  { gap: var(--space-8); }
+
+
+/* ==========================================================================
+   7. COMPONENT — Slider (static)
+   Markup and hooks are complete; nothing moves yet. A script only has to
+   translate [data-slider-track] and flip aria-current on the dots.
+   ========================================================================== */
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-48);
+}
+
+.slider__viewport { width: 100%; }
+
+.slider__track {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--slider-gap);
+}
+
+.slider__slide {
+  flex: 0 0 auto;
+  width: var(--slide-width);
+}
+
+.slider__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-24);
+  min-height: 48px;
+}
+
+/* -- Dots (Figma: 8px circles, inactive at 20% opacity) ------------------- */
+.slider__dots {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.slider__dot {
+  display: block;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  background-color: var(--scheme-1-text);
+  opacity: 0.2;
+}
+
+.slider__dot[aria-current="true"] { opacity: 1; }
+
+/* -- Arrows (Figma: 48px box, 24px glyph) -------------------------------- */
+.slider__arrows {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-16);
+}
+
+.slider-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--slider-arrow-padding);
+  border: 1px solid var(--scheme-1-background);
+  border-radius: var(--radius-slider-arrow);
+  background-color: var(--scheme-1-foreground);
+}
+
+.slider-arrow__icon {
+  width: var(--slider-arrow-icon);
+  height: var(--slider-arrow-icon);
+}
+
+
+/* ==========================================================================
+   8. SECTION — Navbar / 2 /                                          23:208
+   ========================================================================== */
+
+.navbar { background-color: var(--scheme-1-background); }
+
+/* Full bleed inside the page gutter — this bar has no 1280px cap in Figma. */
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-32);
+  padding-block: var(--space-16);
+}
+
+.navbar__brand {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.navbar__logo { display: block; }
+
+.navbar__logo-img {
+  width: 106px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.navbar__nav { flex: 0 0 auto; }
+
+.navbar__list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-32);
+}
+
+.navbar__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--scheme-1-text);
+  font-size: var(--text-regular);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  white-space: nowrap;
+}
+
+.navbar__actions {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+
+/* ==========================================================================
+   9. SECTION — Header / 30 /  (Hero)                                 23:225
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  display: flex;
+  height: clamp(560px, 62.5vw, 900px);   /* 900 / 1440 = 62.5% */
+  overflow: hidden;
+}
+
+.hero__media { z-index: 0; }
+
+.hero__shell {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: var(--page-padding);
+}
+
+.hero__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: var(--container-large);
+}
+
+.hero__column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-32);
+  width: 100%;
+  max-width: var(--max-width-large);
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  width: 100%;
+  text-align: center;
+  color: var(--color-white);
+}
+
+.hero__title {
+  font-size: var(--heading-1);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-heading);
+}
+
+.hero__subtitle {
+  font-size: var(--text-medium);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+}
+
+/* Inner spans exist so a transform can move the text without moving the box. */
+.hero__title-inner,
+.hero__subtitle-inner { display: inline-block; }
+
+.hero__actions { gap: var(--space-16); }
+
+
+/* ==========================================================================
+   10. SECTION — Layout / 651 /  (Full Self-Driving)                  23:234
+   ========================================================================== */
+
+.feature__card {
+  display: flex;
+  align-items: stretch;
+  min-height: 480px;
+  overflow: hidden;
+  border: var(--stroke-border-width) solid var(--scheme-1-border);
+  border-radius: var(--radius-large);
+  background-color: var(--scheme-1-foreground);
+}
+
+/* 50% basis, not 0 — a padded flex item with a zero basis is floored at its
+   own padding and would end up wider than its unpadded sibling. */
+.feature__body {
+  flex: 1 1 50%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-32);
+  padding: var(--space-48);
+}
+
+.feature__stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+.feature__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  color: var(--scheme-1-text);
+}
+
+.feature__title-inner { display: inline-block; }
+
+.feature__media {
+  flex: 1 1 50%;
+  min-width: 0;
+  align-self: stretch;
+}
+
+/* -- Metric pair --------------------------------------------------------- */
+.metrics {
+  display: flex;
+  gap: var(--space-24);
+  padding-block: var(--space-8);
+  color: var(--scheme-1-text);
+}
+
+.metric {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.metric__value {
+  font-size: var(--heading-4);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-heading);
+}
+
+.metric__label {
+  font-size: var(--text-regular);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-body);
+}
+
+
+/* ==========================================================================
+   11. SECTION — Product / 12 /  (Vehicles & Energy sliders)   23:256, 23:364
+   ========================================================================== */
+
+/* The track deliberately overruns the 1280px container; the section clips it
+   at the page edge, exactly as the Figma frame does. */
+.showcase {
+  overflow: hidden;
+  overflow: clip;
+}
+
+.product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-24);
+  aspect-ratio: 1080 / 630;
+  min-height: 380px;
+  padding: clamp(24px, 3.333vw, 48px);
+  overflow: hidden;
+  color: var(--color-white);
+}
+
+.product-card__media { z-index: 0; }
+
+.product-card__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-24);
+}
+
+.product-card__top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.product-card__tagline {
+  font-size: var(--text-regular);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
+}
+
+.product-card__tagline-inner,
+.product-card__title-inner { display: inline-block; }
+
+.product-card__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+.product-card__meta {
+  font-size: var(--text-medium);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
+}
+
+
+/* ==========================================================================
+   12. SECTION — Layout / 362 /  (Current Offers + Inventory)         23:301
+   ========================================================================== */
+
+.quicklinks__row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-32);
+}
+
+.quicklinks__item {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+}
+
+.split-card {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 320px;
+  overflow: hidden;
+  border: var(--stroke-border-width) solid var(--scheme-1-border);
+  border-radius: var(--radius-large);
+  background-color: var(--scheme-1-foreground);
+}
+
+.split-card__body {
+  flex: 1 1 50%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-24);
+  padding: var(--space-24);
+}
+
+.split-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  color: var(--scheme-1-text);
+}
+
+.split-card__title-inner { display: inline-block; }
+
+.split-card__text {
+  font-size: var(--text-regular);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+}
+
+.split-card__media {
+  flex: 1 1 50%;
+  min-width: 0;
+  align-self: stretch;
+}
+
+
+/* ==========================================================================
+   13. SECTION — Contact / 16 /  (Charging map)                       23:326
+   ========================================================================== */
+
+.map__media {
+  width: 100%;
+  aspect-ratio: 1280 / 720;
+  border-radius: var(--radius-large);
+}
+
+
+/* ==========================================================================
+   14. SECTION — Stats / 14 /  (Find Your Charge)                     23:329
+   ========================================================================== */
+
+.stats { background-color: var(--scheme-3-background); }
+
+.stats__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-80);
+}
+
+.stats__lead {
+  flex: 0 0 auto;
+  width: 616px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+.stats__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  color: var(--scheme-3-text);
+}
+
+.stats__title-inner { display: inline-block; }
+
+.stats__list {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-48);
+}
+
+.stat {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding-left: var(--space-32);
+  border-left: var(--stroke-divider-width) solid var(--scheme-3-border);
+  color: var(--scheme-3-text);
+}
+
+.stat__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+}
+
+.stat__value {
+  font-size: var(--heading-2);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-heading);
+  white-space: nowrap;
+}
+
+.stat__icon {
+  flex: 0 0 auto;
+  width: var(--stat-icon);
+  height: var(--stat-icon);
+}
+
+
+/* ==========================================================================
+   15. SECTION — Footer / 7 /                                         23:393
+   ========================================================================== */
+
+.site-footer {
+  padding-block: var(--section-padding-medium);
+  background-color: var(--scheme-1-background);
+}
+
+.site-footer__credits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+}
+
+.site-footer__divider {
+  width: 100%;
+  height: 0;
+  border-top: var(--stroke-divider-width) solid var(--scheme-1-border);
+}
+
+.site-footer__row {
+  display: flex;
+  justify-content: center;
+}
+
+.site-footer__content {
+  flex: 1 0 0;
+  min-width: 0;
+  max-width: var(--max-width-footer);
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-32);
+  color: var(--scheme-1-text);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-body);
+}
+
+/* Flex, so the item box is the link box — an inline-block would inherit the
+   16px strut and make the row 3px taller than the design. */
+.site-footer__item { display: flex; }
+
+.site-footer__link {
+  display: block;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================================
+   16. RESPONSIVE
+   The Figma file ships a desktop frame only (1440). Everything below is a
+   documented adaptation — no content is dropped at any width.
+   ========================================================================== */
+
+/* -- Stats column stacks before the copy gets squeezed -------------------- */
+@media (max-width: 1100px) {
+  .stats__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-48);
+  }
+
+  .stats__lead { width: 100%; }
+}
+
+/* -- Feature card stacks: copy over image -------------------------------- */
+@media (max-width: 900px) {
+  .feature__card {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .feature__body {
+    flex: 0 0 auto;
+    padding: var(--space-32);
+  }
+
+  .feature__media {
+    flex: 0 0 auto;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .metrics { gap: var(--space-16); }
+}
+
+/* -- Tablet -------------------------------------------------------------- */
+@media (max-width: 767px) {
+  /* Navbar wraps into two rows so every link stays reachable. */
+  .navbar__inner {
+    flex-wrap: wrap;
+    gap: var(--space-16);
+  }
+
+  .navbar__brand   { order: 1; flex: 1 1 auto; }
+  .navbar__actions { order: 2; flex: 0 0 auto; }
+
+  .navbar__nav {
+    order: 3;
+    flex: 1 0 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .navbar__nav::-webkit-scrollbar { display: none; }
+
+  .navbar__list { gap: var(--space-24); }
+
+  /* Quicklink cards stack. */
+  .quicklinks__row {
+    flex-direction: column;
+    gap: var(--space-24);
+  }
+
+  .split-card {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .split-card__body  { flex: 0 0 auto; }
+
+  .split-card__media {
+    flex: 0 0 auto;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+  }
+
+  /* A wider slide with a smaller peek reads better on a phone. */
+  .slider { gap: var(--space-32); }
+  .slider__slide { width: 88%; }
+
+  /* Metrics side by side would clip the 13-digit figure. */
+  .metrics {
+    flex-direction: column;
+    gap: var(--space-24);
+  }
+
+  /* Stats keep their rule as a top border once they stack. */
+  .stats__list {
+    flex-direction: column;
+    gap: var(--space-32);
+  }
+
+  .stat {
+    padding-left: 0;
+    padding-top: var(--space-24);
+    border-left: 0;
+    border-top: var(--stroke-divider-width) solid var(--scheme-3-border);
+  }
+
+  .site-footer__links { gap: var(--space-16) var(--space-24); }
+}
+
+/* -- Small phones -------------------------------------------------------- */
+@media (max-width: 480px) {
+  .actions { gap: var(--space-16); }
+
+  .btn {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .btn__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stat__value { white-space: normal; }
+}
+
+
+/* ==========================================================================
+   17. MOTION LAYER
+   Intentionally inert. This page ships zero animation, transition or
+   transform-over-time. What lives here is the vocabulary a later pass
+   should reach for, plus the accessibility guard that will cover it.
+   See README.md → "Adding motion".
+   ========================================================================== */
+
+:root {
+  /* Durations */
+  --motion-instant: 120ms;
+  --motion-fast:    220ms;
+  --motion-base:    420ms;
+  --motion-slow:    700ms;
+  --motion-slower:  1200ms;
+
+  /* Easing */
+  --ease-standard:   cubic-bezier(0.20, 0.00, 0.00, 1.00);
+  --ease-out:        cubic-bezier(0.16, 1.00, 0.30, 1.00);
+  --ease-in-out:     cubic-bezier(0.65, 0.00, 0.35, 1.00);
+  --ease-overshoot:  cubic-bezier(0.34, 1.56, 0.64, 1.00);
+
+  /* Travel distances for reveals */
+  --motion-rise:  24px;
+  --motion-slide: 48px;
+
+  /* Stagger step for grouped children */
+  --motion-stagger: 80ms;
+}
+
+/* Any motion added later is switched off here automatically. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
