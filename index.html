@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="motion/magnetic-button.css">
 </head>
 <body>
 
@@ -38,7 +39,7 @@
     </nav>
 
     <div class="navbar__actions">
-      <a class="btn btn--primary btn--sm" href="#" data-motion="navbar-cta">
+      <a class="btn btn--primary btn--sm" href="#" data-motion="navbar-cta" data-motion-target="magnetic-button">
         <span class="btn__label" lang="mn">Жолоодож үзэх</span>
       </a>
     </div>
@@ -73,7 +74,7 @@
           </div>
 
           <div class="actions actions--center hero__actions" data-motion="hero-actions">
-            <a class="btn btn--primary" href="#" data-motion="hero-cta">
+            <a class="btn btn--primary" href="#" data-motion="hero-cta" data-motion-target="magnetic-button">
               <span class="btn__label" lang="mn">Одоо захиалах</span>
             </a>
             <a class="btn btn--light" href="#" data-motion="hero-cta">
@@ -502,6 +503,8 @@
     </div>
   </div>
 </footer>
+
+<script src="motion/magnetic-button.js" defer></script>
 
 </body>
 </html>

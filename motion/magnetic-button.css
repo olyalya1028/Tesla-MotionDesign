@@ -1,0 +1,48 @@
+/* ==========================================================================
+   Magnetic Button — isolated motion module
+
+   Targets only [data-motion-target~="magnetic-button"]. Nothing in here is
+   referenced by styles.css, and styles.css defines nothing this file needs —
+   the two are independent. To remove this effect entirely: delete this file
+   and motion/magnetic-button.js, delete their <link>/<script> lines in
+   index.html, and (optionally, cosmetically only) the now-inert
+   data-motion-target="magnetic-button" attributes. The static page is then
+   pixel-identical to before this module existed.
+   ========================================================================== */
+
+:root {
+  /* Tunables read by magnetic-button.js at runtime via getComputedStyle.
+     Edit values here — the custom property names are part of the JS
+     contract, so don't rename them without updating the script. */
+  --magnetic-max-offset:        8px;    /* per-axis cap on the button's pull */
+  --magnetic-label-ratio:       0.4;    /* label travels this fraction of the button's offset */
+  --magnetic-influence-padding: 48px;   /* zone beyond the button's own box that starts the pull */
+  --magnetic-follow-ease:       0.2;    /* 0–1 per-frame convergence rate while tracking the pointer */
+  --magnetic-spring-duration:   460ms;  /* release animation length — keep within 420–520ms */
+}
+
+/* A plain inline <span> is not a reliably transformable box in every engine;
+   inline-block makes it one. The label's text never wraps inside a .btn
+   (white-space: nowrap upstream in styles.css), so this changes nothing
+   about how it looks or lays out — only that it now accepts `transform`. */
+[data-motion-target~="magnetic-button"] .btn__label {
+  display: inline-block;
+}
+
+/* Compositor hint, applied only while a given instance is actually animating
+   (the script toggles this class) rather than sitting on the button at rest. */
+[data-motion-target~="magnetic-button"].is-magnetic-active,
+[data-motion-target~="magnetic-button"].is-magnetic-active .btn__label {
+  will-change: transform;
+}
+
+/* Defense in depth. The script never starts this effect when reduced motion
+   is requested (see the matchMedia gate in magnetic-button.js), so this rule
+   should never have anything to override — it exists only to guarantee that
+   no stray transform can survive a mid-interaction settings change. */
+@media (prefers-reduced-motion: reduce) {
+  [data-motion-target~="magnetic-button"],
+  [data-motion-target~="magnetic-button"] .btn__label {
+    transform: none !important;
+  }
+}

@@ -1,8 +1,11 @@
 # Tesla — Motion Design Base
 
-Figma дизайны дагуу угсарсан **static HTML/CSS website**. Энэ нь motion нэмэх суурь
-давхарга бөгөөд одоогийн байдлаар ямар ч animation, transition, transform-over-time
-болон JavaScript агуулаагүй.
+Figma дизайны дагуу угсарсан **static HTML/CSS website**. Цөм нь (`index.html` +
+`styles.css`) ямар ч animation, transition, transform-over-time болон JavaScript
+агуулаагүй, зөвхөн motion нэмэхэд бэлэн суурь давхарга — доторх бүтэц энэ хэвээрээ
+өөрчлөгдөхгүй. `motion/` дотор нь энэ суурин дээр нэмэгдсэн эхний бодит motion
+модуль (Magnetic Button) байгаа бөгөөд өөрөө тусгаарлагдсан: файлуудыг нь устгахад
+цөм хуудас яг хэвээр сэргэнэ. Дэлгэрэнгүйг §5.6-аас үзнэ үү.
 
 **Дизайны эх сурвалж:**
 [Olya-E3 → Home • Desktop](https://www.figma.com/design/VRSpfRVnxwmdctgaXL9jbY/Olya-E3?node-id=23-207)
@@ -30,6 +33,9 @@ Tesla-MotionDesign/
 │   ├── icon-destination-charger.svg
 │   ├── icon-arrow-back.svg
 │   └── icon-arrow-forward.svg
+├── motion/                 Тусгаарлагдсан motion модулиуд (одоогоор 1) — §5.6
+│   ├── magnetic-button.css
+│   └── magnetic-button.js
 ├── index.html              Бүх section-ий semantic markup
 ├── styles.css              Token → base → component → section → responsive → motion
 └── README.md
@@ -223,6 +229,39 @@ document.querySelectorAll('[data-motion-group="hero"] [data-motion]')
   цухуйх motion (жишээ нь scale-up) хийх бол энэ мөрийг тухайн үед нь өөрчил.
 - Шинэ motion-ыг `styles.css`-ийн `MOTION LAYER` бүлэгт эсвэл тусад нь
   `motion.css` файл үүсгээд бич — section бүлгүүдийг бохирдуулахгүй.
+
+### 5.6 Жишээ модуль — Magnetic Button
+
+`motion/magnetic-button.css` + `motion/magnetic-button.js` нь §5.5-д зөвлөсөн
+"тусад нь файл үүсгэх" загварын анхны бодит хэрэгжилт. Зорилтот селектор:
+`[data-motion-target~="magnetic-button"]` — одоогоор navbar-ийн болон hero-ийн
+үндсэн CTA дээр тавигдсан (`index.html`-ийн 2 газар). Cursor товчны 48px
+influence area-д ороход товчийг pointer руу (тэнхлэг тус бүр дээд тал нь 8px)
+татаж, label нь 40%-иар дагаж хөдөлдөг; `pointerleave`-д 460ms-д зөөлөн
+overshoot-тэй буцдаг. Зөвхөн `requestAnimationFrame` + `transform`; fine
+pointer шаардана; `prefers-reduced-motion` дор бүрэн унтардаг.
+
+**Устгах бол:** `motion/magnetic-button.{css,js}` файлуудыг устгаад,
+`index.html`-ийн `<link>`/`<script>` мөрүүдийг (мөн хүсвэл, гагцхүү
+гоо зүйн үүднээс, инерт `data-motion-target` attribute-уудыг) авчихад
+хуудас өмнөх байдалдаа яг буцна — энэ модуль `styles.css`-тэй ямар ч
+хамааралгүй.
+
+**Баталгаажуулалт.** Rest state (interaction хийгдээгүй үе) нь энэ модуль
+нэмэгдэхээс өмнөх render-тэй `md5`/`cmp`-ээр **байт бүрээр ижил** гэдгийг
+шалгасан (navbar мөр болон бүхэл hero region дээр). `consider()`/`release()`
+доторх hit-test, clamp, target тооцоолол, label ratio (0.4×), instance
+хоорондын тусгаарлалт (жишээ нь hero-ийн хоёр дахь товч хэзээ ч
+хөдлөхгүй)-ыг synthetic pointer event дамжуулан шууд трэйс хийж баталсан.
+`easeOutBack` функцийг гараар тооцоолж f(0)=0, f(1)=1, ганцхан зөөлөн
+overshoot (давтагдахгүй)-той гэдгийг нотолсон. **Нэг зүйл:** headless
+Chrome-ийн `--virtual-time-budget` горим нь удаан хугацааны
+`requestAnimationFrame`-ийн дараалсан гүйцэтгэлийг тогтвортой
+дуурайдаггүй тул release-ийн 460ms spring-ийн ЭЦСИЙН dump-dom snapshot-ыг
+автоматаар авч чадаагүй (rAF энэ тусгай test harness-д тасалддаг, бодит
+browser tab дээр тохиолддоггүй асуудал) — доторх логик задаргаагаар бүрэн
+баталгаажсан ч, хэрэв боломжтой бол бодит browser дээр гараар нэг удаа
+шалгаж үзэхийг зөвлөж байна.
 
 ---
 
