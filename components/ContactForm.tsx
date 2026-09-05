@@ -82,6 +82,7 @@ export function ContactForm() {
   const [values, setValues] = useState<Values>(EMPTY_VALUES);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   // Errors only appear after the first submit attempt, then update live while
   // the visitor fixes them — no scolding halfway through typing an email.
   const [validateLive, setValidateLive] = useState(false);
@@ -112,16 +113,41 @@ export function ContactForm() {
     }
 
     setStatus("submitting");
-    // TODO: POST to the real contact endpoint once one exists — until then the
-    // details never leave component state.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    setStatus("sent");
+    setSubmitError(null);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: values.name.trim(),
+          email: values.email.trim(),
+          phone: values.phone.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error ?? "Request failed.");
+      }
+
+      setStatus("sent");
+    } catch (error) {
+      // The details stay in state, so the visitor can just press send again.
+      setSubmitError(
+        error instanceof Error && error.message
+          ? error.message
+          : "We could not send your details. Please try again.",
+      );
+      setStatus("idle");
+    }
   }
 
   function reset() {
     setValues(EMPTY_VALUES);
     setErrors({});
     setValidateLive(false);
+    setSubmitError(null);
     setStatus("idle");
   }
 
@@ -246,6 +272,14 @@ export function ContactForm() {
                         {status === "submitting" ? "Илгээж байна…" : "Хүсэлт илгээх"}
                       </span>
                     </button>
+                    {submitError && (
+                      <p
+                        role="alert"
+                        className="text-small leading-body text-form-error"
+                      >
+                        {submitError}
+                      </p>
+                    )}
                     <p className="text-small leading-body text-scheme1-text/60">
                       We only use your details to reply to this request.
                     </p>
