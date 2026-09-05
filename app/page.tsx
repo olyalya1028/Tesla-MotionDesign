@@ -5,6 +5,7 @@ import { ShowcaseSection } from "@/components/ShowcaseSection";
 import { Quicklinks } from "@/components/Quicklinks";
 import { ChargingMap } from "@/components/ChargingMap";
 import { StatsCharging } from "@/components/StatsCharging";
+import { ContactForm } from "@/components/ContactForm";
 import { Footer } from "@/components/Footer";
 import { vehicleSlides, energySlides } from "@/lib/slides";
 
@@ -20,6 +21,7 @@ export default function HomePage() {
         <ChargingMap />
         <StatsCharging />
         <ShowcaseSection id="energy" slides={energySlides} />
+        <ContactForm />
       </main>
       <Footer />
     </>

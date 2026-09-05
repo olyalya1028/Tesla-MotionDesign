@@ -27,6 +27,9 @@ const config: Config = {
         "scheme3-bg": "#f2f2f2",
         "scheme3-text": "#020809",
         "scheme3-border": "rgba(2, 8, 9, 0.15)",
+        // UI-state colour, not in the Figma frame — only the contact form's
+        // invalid-field border and message use it.
+        "form-error": "#c02b2b",
       },
       fontFamily: {
         sans: [
