@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Base — mirrors legacy-static/styles.css §2 (reset) and §4 (focus ring).
+   Everything else moved into Tailwind utility classes on the components.
+   ========================================================================== */
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-scheme1-bg text-scheme1-text font-sans text-regular font-normal leading-body;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6, p, figure {
+    margin: 0;
+  }
+
+  ul, ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img, svg {
+    display: block;
+  }
+
+  button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  hr {
+    margin: 0;
+    border: 0;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.royal-blue");
+    outline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Used on the navbar's mobile nav row and the slider viewport — scrolls
+     natively but hides the browser's scrollbar chrome. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Magnetic Button — motion tunables read by hooks/useMagneticButton.ts at
+   runtime via getComputedStyle. The custom property names are part of that
+   hook's contract; don't rename them without updating it. Mirrors
+   legacy-static/motion/magnetic-button.css.
+   ========================================================================== */
+:root {
+  --magnetic-max-offset: 8px;
+  --magnetic-label-ratio: 0.4;
+  --magnetic-influence-padding: 48px;
+  --magnetic-follow-ease: 0.2;
+  --magnetic-spring-duration: 460ms;
+}
+
+/* Any motion added later is switched off here automatically. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-magnetic-active] {
+    transform: none !important;
+  }
+}

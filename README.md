@@ -1,11 +1,14 @@
 # Tesla — Motion Design Base
 
-Figma дизайны дагуу угсарсан **static HTML/CSS website**. Цөм нь (`index.html` +
-`styles.css`) ямар ч animation, transition, transform-over-time болон JavaScript
-агуулаагүй, зөвхөн motion нэмэхэд бэлэн суурь давхарга — доторх бүтэц энэ хэвээрээ
-өөрчлөгдөхгүй. `motion/` дотор нь энэ суурин дээр нэмэгдсэн эхний бодит motion
-модуль (Magnetic Button) байгаа бөгөөд өөрөө тусгаарлагдсан: файлуудыг нь устгахад
-цөм хуудас яг хэвээр сэргэнэ. Дэлгэрэнгүйг §5.6-аас үзнэ үү.
+**Next.js (App Router) + TypeScript + Tailwind CSS** дээр угсарсан сайт. Анх
+static HTML/CSS (`index.html` + `styles.css`) байсныг Next.js рүү бүрэн
+дахин загварчилсан — тэр эхний static build нь `legacy-static/` дотор лавлагаа
+болгон хадгалагдсан (устгаагүй, зүгээр ашиглагдахгүй болсон). Доорх бичиг
+баримт хуучин static build-ийн Figma-с гаргасан шийдвэрүүдийг (token, section
+зураглал, responsive логик) тайлбарладаг бөгөөд эдгээр нь **утгаараа өөрчлөгдөөгүй**
+— зөвхөн `styles.css`-ийн CSS custom property байсан зүйлс одоо
+`tailwind.config.ts`-ийн `theme.extend`-д, ​​`data-motion`/vanilla JS байсан зүйлс
+React component/hook болж шилжсэн. §0 үзнэ үү.
 
 **Дизайны эх сурвалж:**
 [Olya-E3 → Home • Desktop](https://www.figma.com/design/VRSpfRVnxwmdctgaXL9jbY/Olya-E3?node-id=23-207)
@@ -13,37 +16,44 @@ Figma дизайны дагуу угсарсан **static HTML/CSS website**. Ц
 
 ---
 
-## 1. Файлын бүтэц
+## 0. Next.js бүтэц (одоогийн)
 
 ```
 Tesla-MotionDesign/
-├── assets/                 Figma-аас экспортолсон зураг, icon (15 файл)
-│   ├── tesla-logo.png
-│   ├── hero-model-3.png
-│   ├── fsd-interior.png
-│   ├── vehicle-model-y-l-premium.png
-│   ├── vehicle-model-3.png
-│   ├── vehicle-model-y.png
-│   ├── offers-current.png
-│   ├── offers-inventory.png
-│   ├── charging-map.png
-│   ├── energy-solar-panels.png
-│   ├── energy-powerwall.png
-│   ├── icon-supercharger.svg
-│   ├── icon-destination-charger.svg
-│   ├── icon-arrow-back.svg
-│   └── icon-arrow-forward.svg
-├── motion/                 Тусгаарлагдсан motion модулиуд (одоогоор 1) — §5.6
-│   ├── magnetic-button.css
-│   └── magnetic-button.js
-├── index.html              Бүх section-ий semantic markup
-├── styles.css              Token → base → component → section → responsive → motion
+├── app/
+│   ├── layout.tsx          <html>/<body>, Manrope (next/font), <CalEmbed/>
+│   ├── page.tsx            Бүх section-ийг эмхэтгэдэг home page
+│   └── globals.css         Tailwind directives + reset + motion tunables
+├── components/
+│   ├── Navbar.tsx, Hero.tsx, FeatureSelfDriving.tsx, Quicklinks.tsx,
+│   │   ChargingMap.tsx, StatsCharging.tsx, Footer.tsx   — 1 файл = 1 section
+│   ├── ShowcaseSection.tsx + Slider.tsx  — vehicles/energy slider (хоёуланд адилхан)
+│   ├── Button.tsx          Бүх btn variant + Cal.com trigger + magnetic hook
+│   ├── Media.tsx           .media/.media--fill/.media__img-ийн next/image аналог
+│   └── CalEmbed.tsx        Cal.com "pop up via element click" embed (client)
+├── hooks/useMagneticButton.ts   §5.6-ийн Magnetic Button-ий React hook хувилбар
+├── lib/
+│   ├── cal.ts              Cal.com link/namespace/config тогтмолууд
+│   └── slides.ts           Vehicle/energy slider-ийн контент
+├── public/assets/          Figma-аас экспортолсон зураг, icon (15 файл, хуучин ./assets/)
+├── legacy-static/          Хуучин static build (index.html, styles.css, motion/) — лавлагаанд
+├── tailwind.config.ts      Figma token → Tailwind theme.extend (color/font/spacing/screens)
+├── package.json, tsconfig.json, next.config.mjs, postcss.config.mjs
 └── README.md
 ```
 
-**Ажиллуулах:** build step шаардлагагүй. `index.html`-ийг browser дээр нээхэд болно
-(эсвэл дурын static server-ээр түгээнэ). Гадаад хамаарал нь зөвхөн Google Fonts-оос
-татагдах **Manrope** фонт; интернэт байхгүй үед system sans-serif руу уначихна.
+**Ажиллуулах:** энэ машин дээр Node.js суулгаагүй тул шалгаагүй, гэхдээ
+стандарт урсгал:
+
+```
+npm install
+npm run dev      # http://localhost:3000
+npm run build && npm run start   # production
+```
+
+Гадаад хамаарал: Google Fonts-ийн оронд **next/font/google**-ээр татагддаг
+Manrope (build-ийн үед self-host болгодог тул runtime интернэт шаардахгүй), мөн
+Cal.com-ийн `embed.js` (зөвхөн "Жолоодож үзэх" товч дарахад л татагддаг).
 
 ---
 
@@ -89,23 +99,26 @@ comment-ээр тэмдэглэгдсэн байгаа.
 
 ## 3. Design token
 
-Figma-ийн variable collection-ыг `styles.css` дэх `:root` рүү 1:1 буулгасан.
-Өнгө, хэмжээ засах бол **зөвхөн тэндээс** засна.
+> **Next.js-т:** энэ хүснэгтийн утгууд бүгд одоо `tailwind.config.ts`-ийн
+> `theme.extend`-д амьдардаг (Tailwind нэрээр: `text-heading-1`, `bg-royal-blue`,
+> `px-page`, `py-section-lg`, `max-w-container`, `rounded-card`, гэх мэт).
+> Хуучин `--css-custom-property` нэрс зөвхөн лавлагаа/Figma зураглал болгон
+> доор үлдсэн. Өнгө, хэмжээ засах бол **зөвхөн `tailwind.config.ts`-ээс** засна.
 
-| Figma variable | CSS custom property | Утга |
-|---|---|---|
-| Color / Royal Blue | `--color-royal-blue` | `#4e6cda` |
-| Color / Neutral Darkest | `--color-neutral-darkest` | `#020809` |
-| Color Scheme 1 / Background · Foreground · Border | `--scheme-1-background` · `--scheme-1-foreground` · `--scheme-1-border` | `#ffffff` · `#f2f2f2` · `rgba(2,8,9,.15)` |
-| Color Scheme 3 / Background | `--scheme-3-background` | `#f2f2f2` |
-| Text Sizes / Heading 1…6 | `--heading-1` … `--heading-6` | 72 · 52 · 44 · 36 · 28 · 22 |
-| Text Sizes / Text Medium · Regular · Small | `--text-medium` · `--text-regular` · `--text-small` | 18 · 16 · 14 |
-| Radius / Large | `--radius-large` | `8px` |
-| Stroke / Divider Width | `--stroke-divider-width` | `1px` |
-| Page Padding / padding-global | `--page-padding` | `64px` |
-| Section Padding / large · medium | `--section-padding-large` · `--section-padding-medium` | `112px` · `80px` |
-| Container / container-large | `--container-large` | `1280px` |
-| Max Width / max-width-large | `--max-width-large` | `768px` |
+| Figma variable | Хуучин CSS custom property | Tailwind (одоо) | Утга |
+|---|---|---|---|
+| Color / Royal Blue | `--color-royal-blue` | `royal-blue` | `#4e6cda` |
+| Color / Neutral Darkest | `--color-neutral-darkest` | `neutral-darkest` | `#020809` |
+| Color Scheme 1 / Background · Foreground · Border | `--scheme-1-background` · `--scheme-1-foreground` · `--scheme-1-border` | `scheme1-bg` · `scheme1-fg` · `scheme1-border` | `#ffffff` · `#f2f2f2` · `rgba(2,8,9,.15)` |
+| Color Scheme 3 / Background | `--scheme-3-background` | `scheme3-bg` | `#f2f2f2` |
+| Text Sizes / Heading 1…6 | `--heading-1` … `--heading-6` | `heading-1` … `heading-6` | 72 · 52 · 44 · 36 · 28 · 22 |
+| Text Sizes / Text Medium · Regular · Small | `--text-medium` · `--text-regular` · `--text-small` | `medium` · `regular` · `small` | 18 · 16 · 14 |
+| Radius / Large | `--radius-large` | `card` | `8px` |
+| Stroke / Divider Width | `--stroke-divider-width` | (Tailwind default `border` = 1px) | `1px` |
+| Page Padding / padding-global | `--page-padding` | `page` | `64px` |
+| Section Padding / large · medium | `--section-padding-large` · `--section-padding-medium` | `section-lg` · `section-md` | `112px` · `80px` |
+| Container / container-large | `--container-large` | `container` | `1280px` |
+| Max Width / max-width-large | `--max-width-large` | (Tailwind default `3xl` = 768px) | `768px` |
 
 **Fluid scale.** Type болон spacing token-ууд `clamp()`-аар 480px–1440px хооронд
 шугаман өөрчлөгдөнө. Дээд хязгаар нь Figma-гийн яг утга, тиймээс **≥1440px дээр
